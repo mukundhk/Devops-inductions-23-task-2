@@ -1,10 +1,10 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    posts (id) {
+    users (id) {
         id -> Int4,
-        title -> Varchar,
-        body -> Text,
-        published -> Bool,
+        user_name -> Varchar,
+        user_email -> Varchar,
+        user_password -> Varchar,
     }
 }

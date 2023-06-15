@@ -1,7 +1,7 @@
 -- Your SQL goes here
-CREATE TABLE posts (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  title VARCHAR NOT NULL,
-  body TEXT NOT NULL,
-  published BOOLEAN NOT NULL DEFAULT FALSE
+  user_name VARCHAR NOT NULL,
+  user_email VARCHAR NOT NULL,
+  user_password VARCHAR NOT NULL
 )
