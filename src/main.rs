@@ -6,6 +6,7 @@ use login_app_backend::establish_connection;
 use actix_web::middleware::Logger;
 use env_logger::Env;
 
+
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello, Actix Web!")
 }
@@ -14,8 +15,8 @@ async fn index() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {    
     
-    let _connection = &mut establish_connection();
-    println!("Connection to DB Established \n");
+    let connection = &mut establish_connection();
+    println!("Connection to DB Established !\n");
 
     // env::set_var("RUST_LOG", "actix_web=debug,actix_server=info");
     env_logger::init_from_env(Env::default().default_filter_or("info"));
