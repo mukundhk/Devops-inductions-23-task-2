@@ -1,10 +1,16 @@
 //To actually use them
 mod services { 
+    //Adding pub makes it public and we can use the functions in the file
     pub mod db; 
-    pub mod endpoints;}
-mod models {pub mod models;}
+    pub mod endpoints;
+}
+mod models {
+    pub mod models;
+}
+//Using root level file
 pub mod schema;
 
+//By keeping all these files in main, [Intellisense/Rust sees them]
 use actix_web::{web, App,middleware, HttpResponse, HttpServer, Responder};
 //Connecting to database
 
@@ -18,8 +24,6 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello, Actix Web!")
 }
 
-
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {    
     println!("Connection to DB Established !\n");
@@ -29,8 +33,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .route("/", web::get().to(index))
-            .route("/create", web::get().to(create_new_user))
-            .route("/get", web::get().to(get_user))
+            .route("/create", web::post().to(create_new_user))
+            .route("/get/{name}", web::get().to(get_user))
     })
     .bind("127.0.0.1:8080")?
     .run()
