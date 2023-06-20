@@ -5,15 +5,18 @@ use crate::schema::users::user_name;
 use crate::schema::users::dsl::users;
 use crate::models::models::{User,CreateUser,RequestResponse,UserResponse,QueryUser};
 use diesel::prelude::*;
+use crate::DbPool;
+use crate::services::db::create_user;
 
 
 #[post("/createUser")]
-pub async fn create_new_user(info : web::Json<CreateUser>) -> Result<impl Responder, Error>{
+pub async fn create_new_user(pool: web::Data<DbPool>,info : web::Json<CreateUser>) -> Result<impl Responder, Error>{
     println!("Check {}",info.user_name);
-    let connection = &mut db::establish_connection();
-    // println!("Check 2");
-    db::create_user(connection, &info.user_name,&info.user_email,&info.user_password);
-    // println!("Check 3");
+    
+    let _new_user = web::block(move || {
+        let conn = &mut pool.get().unwrap();
+        create_user(conn,&info.user_name,&info.user_email,&info.user_password)
+      });
 
     let message = RequestResponse {
         message:"User has been created".to_string(),
