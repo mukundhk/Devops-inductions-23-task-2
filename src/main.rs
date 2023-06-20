@@ -11,7 +11,7 @@ mod models {
 pub mod schema;
 
 //By keeping all these files in main, [Intellisense/Rust sees them]
-use actix_web::{web, App,middleware, HttpResponse, HttpServer, Responder};
+use actix_web::{web, error,App,middleware, HttpResponse, HttpServer, Responder};
 //Connecting to database
 
 //For logging
@@ -30,8 +30,18 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     HttpServer::new(|| {
+
+        let json_config = web::JsonConfig::default()
+            .limit(4096)
+            .error_handler(|err, _req| {
+                // create custom error response
+                error::InternalError::from_response(err, HttpResponse::Conflict().finish())
+                    .into()
+            });
+
         App::new()
             .wrap(middleware::Logger::default())
+            .app_data(json_config)
             .route("/", web::get().to(index))
             .route("/create", web::post().to(create_new_user))
             .route("/get/{name}", web::get().to(get_user))
