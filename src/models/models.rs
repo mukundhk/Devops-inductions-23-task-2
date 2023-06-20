@@ -3,9 +3,11 @@ use serde::{Deserialize,Serialize};
 use crate::schema::users;
 
 
+
 #[derive(Queryable, Selectable)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
+#[derive(Clone)]
 pub struct User {
     pub id: i32,
     pub user_name: String,
@@ -29,7 +31,18 @@ pub struct CreateUser {
     pub user_password: String,
 }
 
+#[derive(Deserialize)]
+pub struct QueryUser {
+    pub user_name: String,
+}
+
 #[derive(Serialize)]
 pub struct RequestResponse {
     pub message: String,
+}
+
+#[derive(Serialize)]
+pub struct UserResponse {
+    pub user_name: String,
+    pub user_email: String,
 }

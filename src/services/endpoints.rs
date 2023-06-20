@@ -1,14 +1,13 @@
 
-use actix_web::{Responder,web,Error,post};
+use actix_web::{Responder,web,Error,post,get};
 use crate::services::db;
-use crate::HttpResponse;
 use crate::schema::users::user_name;
 use crate::schema::users::dsl::users;
-use crate::models::models::{User,CreateUser,RequestResponse};
+use crate::models::models::{User,CreateUser,RequestResponse,UserResponse,QueryUser};
 use diesel::prelude::*;
 
 
-#[post("/create")]
+#[post("/createUser")]
 pub async fn create_new_user(info : web::Json<CreateUser>) -> Result<impl Responder, Error>{
     println!("Check {}",info.user_name);
     let connection = &mut db::establish_connection();
@@ -22,19 +21,30 @@ pub async fn create_new_user(info : web::Json<CreateUser>) -> Result<impl Respon
     Ok(web::Json(message))
 }
 
-pub async fn get_user(path: web::Path<String>) -> impl Responder {
+#[get("/getUser")]
+pub async fn get_user(info: web::Query<QueryUser>) -> Result<impl Responder, Error>{
     
     let connection = &mut db::establish_connection();
-    let name = path.into_inner();
+    let name = info.into_inner();
 
     let results = users
-        .filter(user_name.eq(name))
+        .filter(user_name.eq(name.user_name))
         .select(User::as_select())
         .load(connection)
         .expect("Error loading posts");
-    if results.len() == 0 {
-        HttpResponse::Ok().body("Your man not here")
+
+    let final_message: UserResponse;
+
+    if results.len() != 0 {
+        final_message = UserResponse {
+            user_name: results[0].clone().user_name,
+            user_email: results[0].clone().user_email,
+        };
     } else {
-        HttpResponse::Ok().body("Your guy is found")
+        final_message = UserResponse {
+            user_name: String::from("Error"),
+            user_email: String::from("Error"),
+        };
     }
+    Ok(web::Json(final_message))
 }

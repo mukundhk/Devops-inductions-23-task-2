@@ -20,6 +20,7 @@ use crate::services::endpoints::create_new_user;
 use crate::services::endpoints::get_user;
 
 
+
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello, Actix Web!")
 }
@@ -43,8 +44,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .app_data(json_config)
             .service(create_new_user)
+            .service(get_user)
             .route("/", web::get().to(index))
-            .route("/get/{name}", web::get().to(get_user))
     })
     .bind("127.0.0.1:8080")?
     .run()
