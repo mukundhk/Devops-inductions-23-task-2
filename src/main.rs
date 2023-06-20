@@ -42,8 +42,8 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(middleware::Logger::default())
             .app_data(json_config)
+            .service(create_new_user)
             .route("/", web::get().to(index))
-            .route("/create", web::post().to(create_new_user))
             .route("/get/{name}", web::get().to(get_user))
     })
     .bind("127.0.0.1:8080")?

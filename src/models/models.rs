@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use serde::{Deserialize};
+use serde::{Deserialize,Serialize};
 use crate::schema::users;
 
 
@@ -27,4 +27,9 @@ pub struct CreateUser {
     pub user_name: String,
     pub user_email: String,
     pub user_password: String,
+}
+
+#[derive(Serialize)]
+pub struct RequestResponse {
+    pub message: String,
 }
