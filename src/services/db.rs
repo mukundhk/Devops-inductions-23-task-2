@@ -1,17 +1,21 @@
 use diesel::{pg::PgConnection};
+use diesel::result::Error;
 use diesel::prelude::*;
-use dotenvy::dotenv;
-use std::env;
+// use dotenvy::dotenv;
+use diesel::r2d2::ConnectionManager;
+use diesel::r2d2::Pool;
+// use std::env;
 use crate::models::models::{NewUser,User};
 
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    //Future plans: Ok prints out connection established
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))    
+pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
+    // let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
+    let database_url = String::from("postgres://postgres:Try2read@localhost:5432/rust_server");
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let pool = Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
+    return pool;
 }
-
 
 pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, user_password: &str) -> User {
     use crate::schema::users;
@@ -23,4 +27,11 @@ pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, u
         .returning(User::as_returning())
         .get_result(conn)
         .expect("Error saving new post")
+}
+
+pub fn get_all_user(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
+    use crate::schema::users::dsl::*;
+
+    let items = users.load::<User>(conn);
+    return items;
 }
