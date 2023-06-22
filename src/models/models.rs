@@ -30,8 +30,8 @@ pub struct CreateUser {
 }
 
 #[derive(Deserialize)]
-pub struct QueryUser {
-    pub user_name: String,
+pub struct UpdateUser {
+    pub user_password: String,
 }
 
 #[derive(Serialize)]

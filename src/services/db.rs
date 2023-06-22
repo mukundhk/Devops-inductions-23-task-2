@@ -36,9 +36,19 @@ pub fn get_all_user(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
     return items;
 }
 
-pub fn get_some(conn: &mut PgConnection,email: &str) -> Result<Vec<User>,Error> {
+pub fn get_some(conn: &mut PgConnection,email: &str) -> Result<User,Error> {
     use crate::schema::users::dsl::*;
 
-    let items = users.filter(user_email.eq(email)).load::<User>(conn);
+    let items = users.filter(user_email.eq(email)).first::<User>(conn);
     return items;
+}
+
+pub fn update_user(conn: &mut PgConnection,email: &str,password: &str) -> Result<User,Error> {
+    use crate::schema::users::dsl::*;
+
+    let person = get_some(conn,email).unwrap();
+    let item = diesel::update(users.find(person.id))
+    .set(user_password.eq(password))
+    .get_result::<User>(conn)?;
+    Ok(item)
 }
