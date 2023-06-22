@@ -35,3 +35,10 @@ pub fn get_all_user(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
     let items = users.load::<User>(conn);
     return items;
 }
+
+pub fn get_some(conn: &mut PgConnection,email: &str) -> Result<Vec<User>,Error> {
+    use crate::schema::users::dsl::*;
+
+    let items = users.filter(user_email.eq(email)).load::<User>(conn);
+    return items;
+}

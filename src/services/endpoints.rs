@@ -5,7 +5,7 @@ use crate::schema::users::dsl::users;
 use crate::models::models::{User,CreateUser,RequestResponse,UserResponse,QueryUser};
 use diesel::prelude::*;
 use crate::DbPool;
-use crate::services::db::{create_user,get_all_user};
+use crate::services::db::{create_user,get_all_user,get_some};
 
 #[post("/createUser")]
 pub async fn create_new_user(pool: web::Data<DbPool>,info : web::Json<CreateUser>) -> Result<impl Responder, Error>{
@@ -34,3 +34,16 @@ pub async fn get_all_present_user(pool: web::Data<DbPool>) -> Result<impl Respon
     Ok(web::Json(found_users))
 }
 
+#[get("/getUser/{email}")]
+pub async fn get_some_user(email: web:: Path <String>,pool: web::Data<DbPool>) -> Result<impl Responder, Error>{
+
+      let details = email.into_inner();
+      let found_users = web::block(move || {
+        let conn = &mut pool.get().unwrap();
+        get_some(conn,&details)
+      })
+      .await?
+      .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(web::Json(found_users))
+}
