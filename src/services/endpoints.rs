@@ -1,9 +1,5 @@
 use actix_web::{Responder,web,Error,post,get};
-use crate::services::db;
-use crate::schema::users::user_name;
-use crate::schema::users::dsl::users;
-use crate::models::models::{User,CreateUser,RequestResponse,UserResponse,QueryUser};
-use diesel::prelude::*;
+use crate::models::models::{CreateUser,RequestResponse};
 use crate::DbPool;
 use crate::services::db::{create_user,get_all_user,get_some};
 
