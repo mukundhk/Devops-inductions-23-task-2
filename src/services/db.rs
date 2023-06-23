@@ -52,3 +52,11 @@ pub fn update_user(conn: &mut PgConnection,email: &str,password: &str) -> Result
     .get_result::<User>(conn)?;
     Ok(item)
 }
+
+pub fn delete_user(conn: &mut PgConnection,email: &str) -> Result<usize,Error> {
+    use crate::schema::users::dsl::*;
+
+    let person = get_some(conn,email).unwrap();
+    let count = diesel::delete(users.find(person.id)).execute(conn)?;
+    Ok(count)
+}
