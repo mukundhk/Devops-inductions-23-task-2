@@ -1,11 +1,12 @@
 use diesel::{pg::PgConnection};
 use diesel::result::Error;
 use diesel::prelude::*;
-// use dotenvy::dotenv;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-// use std::env;
 use crate::models::models::{NewUser,User};
+// use std::env;
+// use dotenvy::dotenv;
+
 
 pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     // let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
@@ -17,30 +18,30 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     return pool;
 }
 
-pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, user_password: &str) -> User {
+pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, user_password: &str) -> Result<User,Error> {
     use crate::schema::users;
 
     let new_user = NewUser { user_name, user_email,user_password };
 
-    diesel::insert_into(users::table)
+    let create = diesel::insert_into(users::table)
         .values(&new_user)
         .returning(User::as_returning())
-        .get_result(conn)
-        .expect("Error saving new post")
+        .get_result(conn)?;
+    Ok(create)
 }
 
 pub fn get_all_user(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
     use crate::schema::users::dsl::*;
 
-    let items = users.load::<User>(conn);
-    return items;
+    let items = users.load::<User>(conn)?;
+    Ok(items)
 }
 
 pub fn get_some(conn: &mut PgConnection,email: &str) -> Result<User,Error> {
     use crate::schema::users::dsl::*;
 
-    let items = users.filter(user_email.eq(email)).first::<User>(conn);
-    return items;
+    let items = users.filter(user_email.eq(email)).first::<User>(conn)?;
+    Ok(items)
 }
 
 pub fn update_user(conn: &mut PgConnection,email: &str,password: &str) -> Result<User,Error> {
