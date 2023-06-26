@@ -21,7 +21,6 @@ pub struct NewUser<'a> {
     pub user_password: &'a str,
 }
 
-
 #[derive(Deserialize)]
 pub struct CreateUser {
     pub user_name: String,
@@ -31,16 +30,6 @@ pub struct CreateUser {
 
 #[derive(Deserialize)]
 pub struct UpdateUser {
-    pub user_password: String,
-}
-
-#[derive(Serialize)]
-pub struct RequestResponse {
-    pub message: String,
-}
-
-#[derive(Serialize)]
-pub struct UserResponse {
-    pub user_name: String,
-    pub user_email: String,
+    pub user_password: Option<String>,
+    pub user_name: Option<String>
 }

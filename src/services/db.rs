@@ -3,10 +3,9 @@ use diesel::result::Error;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-use crate::models::models::{NewUser,User};
+use crate::models::models::{NewUser,User, CreateUser, UpdateUser};
 // use std::env;
 // use dotenvy::dotenv;
-
 
 pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     // let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL");
@@ -18,11 +17,13 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     return pool;
 }
 
-pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, user_password: &str) -> Result<User,Error> {
+pub fn create_user(conn: &mut PgConnection, info: &mut CreateUser) -> Result<User,Error> {
     use crate::schema::users;
-
-    let new_user = NewUser { user_name, user_email,user_password };
-
+    let new_user = NewUser { 
+        user_name: &info.user_name
+        , user_email: &info.user_email
+        ,user_password: &info.user_password 
+    };
     let create = diesel::insert_into(users::table)
         .values(&new_user)
         .returning(User::as_returning())
@@ -30,34 +31,43 @@ pub fn create_user(conn: &mut PgConnection, user_name: &str, user_email: &str, u
     Ok(create)
 }
 
-pub fn get_all_user(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
+pub fn get_all_users(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
     use crate::schema::users::dsl::*;
-
     let items = users.load::<User>(conn)?;
     Ok(items)
 }
 
-pub fn get_some(conn: &mut PgConnection,email: &str) -> Result<User,Error> {
+pub fn get_users(conn: &mut PgConnection,email: &str) -> Result<User,Error> {
     use crate::schema::users::dsl::*;
-
     let items = users.filter(user_email.eq(email)).first::<User>(conn)?;
     Ok(items)
 }
 
-pub fn update_user(conn: &mut PgConnection,email: &str,password: &str) -> Result<User,Error> {
+pub fn update_user(conn: &mut PgConnection,email: &str,update_details: &UpdateUser) -> Result<User,Error> {
     use crate::schema::users::dsl::*;
+    let person = get_users(conn,email).unwrap();
+  
+  let mut final_password = person.user_password;
+  match &update_details.user_password {
+    Some(x) => final_password = x.to_string(),
+    None => {},
+  }
 
-    let person = get_some(conn,email).unwrap();
-    let item = diesel::update(users.find(person.id))
-    .set(user_password.eq(password))
+  let mut final_name = person.user_name;
+  match &update_details.user_name {
+    Some(x) => final_name = x.to_string(),
+    None => {},
+  }
+
+    let item = diesel::update(users.filter(id.eq(person.id)))
+    .set((user_name.eq(final_name),user_password.eq(final_password)))
     .get_result::<User>(conn)?;
     Ok(item)
 }
 
 pub fn delete_user(conn: &mut PgConnection,email: &str) -> Result<usize,Error> {
     use crate::schema::users::dsl::*;
-
-    let person = get_some(conn,email).unwrap();
+    let person = get_users(conn,email).unwrap();
     let count = diesel::delete(users.find(person.id)).execute(conn)?;
     Ok(count)
 }
