@@ -33,3 +33,14 @@ pub struct UpdateUser {
     pub user_password: Option<String>,
     pub user_name: Option<String>
 }
+
+#[derive(Deserialize)]
+pub struct Login {
+    pub user_email: String,
+    pub user_password: String,
+}
+
+#[derive(Serialize)]
+pub struct LoginMessage {
+    pub message: String
+}

@@ -18,7 +18,7 @@ use env_logger::Env;
 use crate::services::endpoints::{
     create_new_user,get_all_present_user,
     get_some_user,update_particular_user,
-    delete_particular_user};
+    delete_particular_user,login_user};
 // use crate::services::endpoints::get_user;
 use crate::services::db::get_connection_pool;
 
@@ -59,6 +59,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_some_user)
             .service(update_particular_user)
             .service(delete_particular_user)
+            .service(login_user)
             .route("/", web::get().to(index))
     })
     .bind("127.0.0.1:8080")?

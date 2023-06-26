@@ -3,7 +3,7 @@ use diesel::result::Error;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-use crate::models::models::{NewUser,User, CreateUser, UpdateUser};
+use crate::models::models::{NewUser,User, CreateUser, UpdateUser,Login,LoginMessage};
 // use std::env;
 // use dotenvy::dotenv;
 
@@ -70,4 +70,24 @@ pub fn delete_user(conn: &mut PgConnection,email: &str) -> Result<usize,Error> {
     let person = get_users(conn,email).unwrap();
     let count = diesel::delete(users.find(person.id)).execute(conn)?;
     Ok(count)
+}
+
+pub fn check_login(conn: &mut PgConnection,login: & mut Login) -> Result<LoginMessage,Error> {
+
+    let mut final_message = LoginMessage {
+        message: String::new()
+    };
+
+    let person = get_users(conn,&login.user_email).unwrap();
+    
+    if person.user_password == login.user_password {
+        final_message = LoginMessage {
+            message: String::from("Login successful")
+        }
+    } else {
+        final_message = LoginMessage {
+            message: String::from("Password incorrect")
+        }
+    }
+    Ok(final_message)
 }
