@@ -19,9 +19,6 @@ Start Server:<br />
 - cargo run
 
 ToDo:
-- Add error handling for no users found
 - Make a proper ReadMe for that poor joon
-- Add response when user deleted
-- Add basic login route
 
 Any problems with setting up server refer to official diesel documents

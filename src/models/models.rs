@@ -40,7 +40,7 @@ pub struct Login {
     pub user_password: String,
 }
 
-#[derive(Serialize)]
-pub struct LoginMessage {
+#[derive(Serialize,Debug)]
+pub struct Response {
     pub message: String
 }

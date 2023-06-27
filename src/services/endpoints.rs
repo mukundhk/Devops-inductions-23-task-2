@@ -33,7 +33,7 @@ pub async fn get_all_present_user(pool: web::Data<DbPool>) -> Result<impl Respon
       })
       .await?
       .map_err(actix_web::error::ErrorInternalServerError)?;
-    Ok(web::Json(found_users))
+    Ok(HttpResponse::Ok().json(found_users))
 }
 
 #[get("/getUser/{email}")]
@@ -58,7 +58,7 @@ pub async fn update_particular_user(email: web:: Path <String>,info : web::Query
       })
       .await?
       .map_err(actix_web::error::ErrorInternalServerError)?;
-    Ok(web::Json(updated_user))
+    Ok(HttpResponse::Ok().json(updated_user))
 }
 
 #[delete("/deleteUser/{email}")]

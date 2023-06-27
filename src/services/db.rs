@@ -1,9 +1,9 @@
 use diesel::{pg::PgConnection};
-use diesel::result::Error;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
 use diesel::r2d2::Pool;
-use crate::models::models::{NewUser,User, CreateUser, UpdateUser,Login,LoginMessage};
+use crate::DbError;
+use crate::models::models::{NewUser,User, CreateUser, UpdateUser,Login,Response};
 // use std::env;
 // use dotenvy::dotenv;
 
@@ -17,7 +17,7 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     return pool;
 }
 
-pub fn create_user(conn: &mut PgConnection, info: &mut CreateUser) -> Result<User,Error> {
+pub fn create_user(conn: &mut PgConnection, info: &mut CreateUser) -> Result<User,DbError> {
     use crate::schema::users;
     let new_user = NewUser { 
         user_name: &info.user_name
@@ -31,21 +31,31 @@ pub fn create_user(conn: &mut PgConnection, info: &mut CreateUser) -> Result<Use
     Ok(create)
 }
 
-pub fn get_all_users(conn: &mut PgConnection) -> Result<Vec<User>,Error> {
+pub fn get_all_users(conn: &mut PgConnection) -> Result<Vec<User>,DbError> {
     use crate::schema::users::dsl::*;
     let items = users.load::<User>(conn)?;
     Ok(items)
 }
 
-pub fn get_users(conn: &mut PgConnection,email: &str) -> Result<User,Error> {
+pub fn get_users(conn: &mut PgConnection,email: &str) -> Result<User,DbError> {
     use crate::schema::users::dsl::*;
-    let items = users.filter(user_email.eq(email)).first::<User>(conn)?;
-    Ok(items)
+
+    let user_result = users.filter(user_email.eq(email)).first::<User>(conn);
+    match user_result {
+        Ok(user) => Ok(user),
+        Err(diesel::result::Error::NotFound) => {
+            let error_message = format!("No users found with email: {}", email);
+            // let custom_error = Response { message: error_message };
+            let test: DbError = String::from(error_message).into();
+            Err(test)
+        }
+        Err(err) => Err(Box::new(err)),
+    }
 }
 
-pub fn update_user(conn: &mut PgConnection,email: &str,update_details: &UpdateUser) -> Result<User,Error> {
+pub fn update_user(conn: &mut PgConnection,email: &str,update_details: &UpdateUser) -> Result<User,DbError> {
     use crate::schema::users::dsl::*;
-    let person = get_users(conn,email).unwrap();
+    let person = get_users(conn,email)?;
   
   let mut final_password = person.user_password;
   match &update_details.user_password {
@@ -65,29 +75,23 @@ pub fn update_user(conn: &mut PgConnection,email: &str,update_details: &UpdateUs
     Ok(item)
 }
 
-pub fn delete_user(conn: &mut PgConnection,email: &str) -> Result<usize,Error> {
+pub fn delete_user(conn: &mut PgConnection,email: &str) -> Result<Response,DbError> {
     use crate::schema::users::dsl::*;
-    let person = get_users(conn,email).unwrap();
-    let count = diesel::delete(users.find(person.id)).execute(conn)?;
-    Ok(count)
+    let person = get_users(conn,email)?;
+    diesel::delete(users.find(person.id)).execute(conn)?;
+    let message = Response {message: String::from("Delete Successful")};
+    Ok(message)
 }
 
-pub fn check_login(conn: &mut PgConnection,login: & mut Login) -> Result<LoginMessage,Error> {
+pub fn check_login(conn: &mut PgConnection,login: & mut Login) -> Result<Response,DbError> {
 
-    let mut final_message = LoginMessage {
-        message: String::new()
-    };
-
-    let person = get_users(conn,&login.user_email).unwrap();
+    let person = get_users(conn,&login.user_email)?;
     
     if person.user_password == login.user_password {
-        final_message = LoginMessage {
-            message: String::from("Login successful")
-        }
+        let final_message = Response {message: String::from("Login successful")};
+        return Ok(final_message);
     } else {
-        final_message = LoginMessage {
-            message: String::from("Password incorrect")
-        }
+        let test: DbError = String::from("Password Incorrect").into();
+        return Err(test);
     }
-    Ok(final_message)
 }
