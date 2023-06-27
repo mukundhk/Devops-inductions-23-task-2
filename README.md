@@ -12,13 +12,10 @@ Database: PosgreSQL<br />
 How to Setup Server:<br />
 - cargo install diesel_cli
 - cargo install diesel_cli --no-default-features --features postgres
-- Add ENV variables for DB connection
+- Add ENV variables for DB connection<br />
 Setup Schema:<br />
-- diesel setup
+- diesel setup<br />
 Start Server:<br />
 - cargo run
-
-ToDo:
-- Make a proper ReadMe for that poor joon
 
 Any problems with setting up server refer to official diesel documents
