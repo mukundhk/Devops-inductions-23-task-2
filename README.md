@@ -20,3 +20,9 @@ How to Setup Server[Linux installation]:<br />
 - cargo run [server runs]
 
 Any problems with setting up server refer to official cargo and diesel documents
+
+
+How to Setup Frontend:<br />
+- cd Frontend<br />
+- install dependencies : npm i<br />
+- start react server :  npm start<br />
