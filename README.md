@@ -9,13 +9,12 @@ Framework: Actix-Web<br />
 ORM: Diesel<br />
 Database: PosgreSQL<br />
 
-How to Setup Server:<br />
-- cargo install diesel_cli
+How to Setup Server[Linux installation]:<br />
+- sudo apt install libpq-dev
 - cargo install diesel_cli --no-default-features --features postgres
+- CREATE DATABASE rust_server [in psql CLI];
 - Add ENV variables for DB connection<br />
-Setup Schema:<br />
-- diesel setup<br />
-Start Server:<br />
-- cargo run
+- diesel setup [Generates the tables]<br />
+- cargo run [server runs]
 
 Any problems with setting up server refer to official diesel documents
