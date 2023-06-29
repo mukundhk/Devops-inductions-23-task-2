@@ -1,7 +1,9 @@
-ClockBuster:
-A Netflix Clone using micro-service architecture<br />
-Consists of multiple micro-services that have a singular function<br />
-login-app-backend is the main REST API used to perform CRUD operations<br />
+Spider Devops Inductions - Task 2 <br />
+
+<br />Instructions:<br />
+Fork the given repo and set the your repo to private<br />
+Setup the server using the instructions given below<br />
+Dockerize the given application using Docker and Docker-compose<br />
 
 Tech Stack:
 Language: Rust<br />
@@ -17,4 +19,4 @@ How to Setup Server[Linux installation]:<br />
 - diesel setup [Generates the tables]<br />
 - cargo run [server runs]
 
-Any problems with setting up server refer to official diesel documents
+Any problems with setting up server refer to official cargo and diesel documents
