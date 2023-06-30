@@ -12,6 +12,7 @@ Framework: <i>Actix-Web</i><br />
 ORM: <i>Diesel</i><br />
 Database: <i>PosgreSQL</i><br />
 Frontend: <i>React</i><br />
+Compilers: <i>Rust v1.7.0 and node v18.0.0</i><br />
 <br/>
 <hr/>
 
