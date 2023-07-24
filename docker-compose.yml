@@ -1,0 +1,49 @@
+version : "3.8"
+
+services:
+  db:
+    image: postgres:15.3-alpine3.18
+    restart: always
+    environment :
+      POSTGRES_USER : postgres
+      POSTGRES_PASSWORD : postgres
+      POSTGRES_DB : rust_server
+    networks:
+      - server-side
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build : ./Backend/
+    restart : always
+    networks:
+      - client-side
+      - server-side
+    depends_on :
+      - db
+    ports:
+      - 8080:8080
+
+  frontend:
+    build : ./Frontend/
+    restart : always
+    depends_on :
+      - backend
+    networks:
+      - client-side
+    ports:
+      - 3000:3000
+
+networks:
+  client-side:
+    driver:
+      bridge
+  server-side:
+    driver:
+      bridge
+
+volumes:
+  db_data:
+    driver: local
